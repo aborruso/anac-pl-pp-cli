@@ -9,7 +9,7 @@ builds:
     env:
       - CGO_ENABLED=0
     ldflags:
-      - -s -w -X anac-pl-pp-cli/internal/cli.version={{ .Version }}
+      - -s -w -X anac-pl-pp-cli/internal/cliutil.Version={{ .Version }}
     targets:
       - darwin_amd64
       - darwin_arm64
@@ -23,7 +23,7 @@ builds:
     env:
       - CGO_ENABLED=0
     ldflags:
-      - -s -w
+      - -s -w -X anac-pl-pp-cli/internal/cliutil.Version={{ .Version }}
     targets:
       - darwin_amd64
       - darwin_arm64

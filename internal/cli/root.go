@@ -18,7 +18,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var version = "1.0.0"
+// version e' la versione mostrata da --version. La fonte e'
+// cliutil.Version, iniettata al build, cosi' che CLI, server MCP e
+// User-Agent dichiarino tutti lo stesso numero.
+var version = cliutil.Version
 
 type rootFlags struct {
 	asJSON        bool
@@ -271,10 +274,32 @@ func (f *rootFlags) newClient() (*client.Client, error) {
 	if err != nil {
 		return nil, configErr(err)
 	}
+	// L'attesa del proprio turno va detta, altrimenti un comando che tace
+	// per minuti sembra bloccato.
+	cliutil.InstanceWaitNotice = func(msg string) { fmt.Fprintln(os.Stderr, msg) }
 	if err := cliutil.AcquireSingleInstance(); err != nil {
 		return nil, &cliError{code: 7, err: err}
 	}
 	c := client.New(cfg, f.timeout, cliutil.ClampRate(f.rateLimit))
+	c.UserAgent = cliutil.UserAgent("anac-pl-pp-cli")
+	c.DryRun = f.dryRun
+	c.NoCache = f.noCache
+	return c, nil
+}
+
+// newClientNoInstanceLock costruisce il client saltando il lock di istanza
+// singola. Serve al solo `doctor`: un controllo di salute deve rispondere
+// mentre un sync lavora, non mettersi in coda dietro di lui per minuti ne'
+// riportare come guasto del client il fatto che un altro comando sia in
+// corso. Il tetto verso ANAC non ne risente: lo tiene Pace(), che condivide
+// il ritmo fra processi diversi.
+func (f *rootFlags) newClientNoInstanceLock() (*client.Client, error) {
+	cfg, err := config.Load(f.configPath)
+	if err != nil {
+		return nil, configErr(err)
+	}
+	c := client.New(cfg, f.timeout, cliutil.ClampRate(f.rateLimit))
+	c.UserAgent = cliutil.UserAgent("anac-pl-pp-cli")
 	c.DryRun = f.dryRun
 	c.NoCache = f.noCache
 	return c, nil

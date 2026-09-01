@@ -26,7 +26,7 @@ jobs:
             workdir="$(mktemp -d)"
             for cmd in anac-pl-pp-cli anac-pl-pp-mcp; do
               CGO_ENABLED=0 GOOS="$GOOS" GOARCH="$GOARCH" go build \
-                -ldflags "-s -w -X anac-pl-pp-cli/internal/cli.version=${VERSION}" \
+                -ldflags "-s -w -X anac-pl-pp-cli/internal/cliutil.Version=${VERSION}" \
                 -o "$workdir/${cmd}${ext}" "./cmd/${cmd}"
             done
             cp README.md LICENSE NOTICE SKILL.md "$workdir/"
