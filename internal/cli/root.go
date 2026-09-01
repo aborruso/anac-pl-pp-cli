@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"anac-pl-pp-cli/internal/client"
+	"anac-pl-pp-cli/internal/cliutil"
 	"anac-pl-pp-cli/internal/config"
 	"github.com/spf13/cobra"
 )
@@ -175,7 +176,7 @@ See README.md or the bundled SKILL.md for recipes.`,
 	rootCmd.PersistentFlags().DurationVar(&flags.maxAge, "max-age", 30*time.Minute, "Maximum acceptable age of local-store data before a stderr hint suggests sync; 0 disables")
 	rootCmd.PersistentFlags().StringVar(&flags.profileName, "profile", "", "Apply values from a saved profile (see 'anac-pl-pp-cli profile list')")
 	rootCmd.PersistentFlags().StringVar(&flags.deliverSpec, "deliver", "", "Route output to a sink: stdout (default), file:<path>, webhook:<url>")
-	rootCmd.PersistentFlags().Float64Var(&flags.rateLimit, "rate-limit", 0, "Max requests per second (0 to disable)")
+	rootCmd.PersistentFlags().Float64Var(&flags.rateLimit, "rate-limit", 0, fmt.Sprintf("Chiamate al secondo, per rallentare ancora: il tetto e' %g/s e non si puo' alzare ne' disattivare", cliutil.MaxRequestsPerSecond))
 
 	rootCmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
 		if flags.deliverSpec != "" {
@@ -270,7 +271,10 @@ func (f *rootFlags) newClient() (*client.Client, error) {
 	if err != nil {
 		return nil, configErr(err)
 	}
-	c := client.New(cfg, f.timeout, f.rateLimit)
+	if err := cliutil.AcquireSingleInstance(); err != nil {
+		return nil, &cliError{code: 7, err: err}
+	}
+	c := client.New(cfg, f.timeout, cliutil.ClampRate(f.rateLimit))
 	c.DryRun = f.dryRun
 	c.NoCache = f.noCache
 	return c, nil

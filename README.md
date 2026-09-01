@@ -75,6 +75,18 @@ anac-pl-pp-cli affidamenti --cpv-code 72412000 -t "" --pages 3 --from-search --c
 anac-pl-pp-cli tipologie list
 ```
 
+## Un limite messo apposta: una chiamata al secondo, una istanza per volta
+
+La piattaforma di ANAC e' un servizio pubblico che non dichiara alcuna quota, e non c'e' un modo per chiedere piu' banda. Il tetto quindi e' scritto nel programma e non e' configurabile: al massimo una richiesta al secondo.
+
+Il ritmo e' condiviso fra processi, non solo dentro il processo: l'istante dell'ultima chiamata sta in `~/.cache/anac-pl-pp-cli/pace.lock`, protetto da un lock esclusivo di sistema. Anche facendo lavorare insieme la CLI e il server MCP, la somma resta una chiamata al secondo.
+
+Due copie della CLI non possono girare in parallelo: la seconda si ferma subito, con un messaggio esplicito e codice di uscita 7. Il lock e' `~/.cache/anac-pl-pp-cli/instance.lock`, rilasciato dal sistema operativo alla fine del processo, quindi non resta mai appeso.
+
+`--rate-limit` esiste ancora, ma serve solo a rallentare ulteriormente: `--rate-limit 0.2` scende a una chiamata ogni cinque secondi, `--rate-limit 100` non alza nulla.
+
+La conseguenza pratica e' che le scansioni lunghe sono lente per costruzione: `sync` di molte pagine va lanciato e lasciato lavorare. Per le analisi ripetute conviene sincronizzare una volta e poi interrogare lo store locale con `search-local` ed `export`, che non toccano la rete.
+
 ## Due avvertenze sui dati
 
 Il campo CPV di `cerca` non e' un filtro sul codice ma un match testuale: restituisce anche avvisi con CPV estranei. Per selezionare davvero per codice serve `cerca-avanzata`, che usa l'endpoint della ricerca avanzata rilasciata in beta a luglio 2026. La CLI lo segnala su stderr quando usi `cerca --cpv`.

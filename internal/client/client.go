@@ -454,6 +454,10 @@ func (c *Client) doInternal(ctx context.Context, method, path string, params map
 	var lastErr error
 
 	for attempt := 0; attempt <= maxRetries; attempt++ {
+		// Tetto invalicabile: non piu' di cliutil.MaxRequestsPerSecond verso
+		// ANAC, qualunque cosa dica il limiter adattivo o la riga di comando.
+		// Sta prima di limiter.Wait() perche' quello puo' solo rallentare.
+		cliutil.Pace()
 		// Proactive rate limiting — wait before sending
 		c.limiter.Wait()
 		var bodyReader io.Reader
