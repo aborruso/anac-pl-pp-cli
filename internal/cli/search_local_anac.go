@@ -65,6 +65,14 @@ func newAnacSearchLocalCmd(flags *rootFlags) *cobra.Command {
 			if rows == nil {
 				rows = []json.RawMessage{}
 			}
+			// Una ricerca senza corrispondenze esce 3 (come il resto della CLI
+			// sulle risorse non trovate): l'uscita su stdout resta quella
+			// normale, cosi' chi legge il JSON non trova sorprese, ma chi
+			// concatena comandi distingue «nessun risultato» da «trovato».
+			if query != "" && len(rows) == 0 {
+				printLocalSearchOutput(cmd, rows, flags)
+				return notFoundErr(fmt.Errorf("nessun avviso locale corrisponde a %q (store: %s)", query, dbPath))
+			}
 			if flags.asJSON || flags.agent || (!isTerminal(cmd.OutOrStdout()) && !flags.csv && !flags.quiet && !flags.plain) {
 				return printJSONFiltered(cmd.OutOrStdout(), rows, flags)
 			}
@@ -85,4 +93,15 @@ func newAnacSearchLocalCmd(flags *rootFlags) *cobra.Command {
 	cmd.Flags().IntVar(&limit, "limit", 50, "numero massimo di risultati")
 	cmd.Flags().StringVar(&dbPath, "db", "", "Percorso del database (default: ~/.local/share/anac-pl-pp-cli/data.db)")
 	return cmd
+}
+
+// printLocalSearchOutput emette l'uscita normale di search-local quando non ci
+// sono righe, prima che il comando esca con codice 3. Serve a non cambiare cio'
+// che legge chi consuma stdout: il codice di uscita e' l'unica novita'.
+func printLocalSearchOutput(cmd *cobra.Command, rows []json.RawMessage, flags *rootFlags) {
+	if flags.asJSON || flags.agent || (!isTerminal(cmd.OutOrStdout()) && !flags.csv && !flags.quiet && !flags.plain) {
+		_ = printJSONFiltered(cmd.OutOrStdout(), rows, flags)
+		return
+	}
+	fmt.Fprintln(cmd.OutOrStdout(), "nessun risultato locale (hai eseguito 'sync'?)")
 }

@@ -29,6 +29,17 @@ func newAvvisiCronologiaCmd(flags *rootFlags) *cobra.Command {
 				return err
 			}
 
+			// PATCH(anac-pl-cronologia-idappalto): il servizio risponde 404
+			// senza idAppalto, che a giugno era facoltativo. Se non lo passa
+			// l'utente, lo si legge dal dettaglio dell'avviso.
+			if flagIdAppalto == "" {
+				resolved, resolveErr := resolveIdAppalto(cmd.Context(), c, args[0])
+				if resolveErr != nil {
+					return classifyAPIError(resolveErr, flags)
+				}
+				flagIdAppalto = resolved
+			}
+
 			path := "/avvisi/{id}/cronologia"
 			path = replacePathParam(path, "id", args[0])
 			params := map[string]string{}
@@ -87,7 +98,7 @@ func newAvvisiCronologiaCmd(flags *rootFlags) *cobra.Command {
 		},
 	}
 	cmd.Flags().BoolVar(&flagRicercaArchivio, "archive", false, "Cerca la cronologia nell'archivio storico")
-	cmd.Flags().StringVar(&flagIdAppalto, "appalto", "", "idAppalto (UUID) opzionale per disambiguare la cronologia")
+	cmd.Flags().StringVar(&flagIdAppalto, "appalto", "", "idAppalto (UUID); se assente viene letto dal dettaglio dell'avviso, che il servizio ora richiede")
 
 	return cmd
 }

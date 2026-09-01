@@ -6,9 +6,29 @@ anac-pl espone l'API pubblica della Piattaforma di Pubblicità a Valore Legale d
 
 Printed by [@aborruso](https://github.com/aborruso) (aborruso).
 
-## Installazione
+## Install
 
-### Binario precompilato (nessuna dipendenza)
+### Dal catalogo Printing Press
+
+Una volta che questa CLI e' nel catalogo, l'installer fa tutto in un comando, binario piu' skill per gli agent:
+
+```bash
+npx -y @mvanhorn/printing-press-library install anac-pl
+```
+
+Solo il binario, senza skill:
+
+```bash
+npx -y @mvanhorn/printing-press-library install anac-pl --cli-only
+```
+
+Senza Node, con Go 1.26.6 o superiore:
+
+```bash
+go install github.com/mvanhorn/printing-press-library/library/other/anac-pl/cmd/anac-pl-pp-cli@latest
+```
+
+### Binario precompilato dal repo dell'autore
 
 Scarica l'archivio per la tua piattaforma dall'[ultima release](https://github.com/aborruso/anac-pl-pp-cli/releases/latest), scompattalo e metti il binario in una cartella del `PATH`.
 
@@ -21,7 +41,7 @@ chmod +x anac-pl-pp-cli
 
 Su macOS, la prima volta va tolta la quarantena di Gatekeeper: `xattr -d com.apple.quarantine anac-pl-pp-cli`.
 
-### Dai sorgenti (richiede Go 1.26.3 o superiore)
+### Dai sorgenti (richiede Go 1.26.6 o superiore)
 
 ```bash
 git clone https://github.com/aborruso/anac-pl-pp-cli.git
@@ -225,6 +245,8 @@ Static request headers can be configured under `headers`; per-command header ove
 **Not found errors (exit code 3)**
 - Check the resource ID is correct
 - Run the `list` command to see available items
+
+- **`search-local` esce 3 quando la ricerca non trova nulla**: e' la risposta, non un guasto. Lo stdout resta quello normale (`[]` in JSON), cambia solo il codice di uscita, cosi' uno script distingue «nessun avviso» da «trovati».
 
 ### API-specific
 - **HTTP 500 sui filtri data** — Usa il formato GG/MM/AAAA per --published-from e --published-to

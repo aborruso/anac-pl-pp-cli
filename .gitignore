@@ -14,3 +14,7 @@ tasks/
 docs/future-ideas.md
 docs/evaluation*.md
 LOG.md
+
+# Proof del collaudo live: contengono path assoluti e output grezzo dell API
+.manuscripts/*/proofs/publish-live-gate.json
+.manuscripts/*/proofs/live-gate.stderr

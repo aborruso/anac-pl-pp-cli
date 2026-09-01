@@ -22,22 +22,20 @@ metadata:
 
 This skill drives the `anac-pl-pp-cli` binary. **You must verify the CLI is installed before invoking any command from this skill.** If it is missing, install it first:
 
-1. Install via the Printing Press installer:
+1. Install via the Printing Press installer. It defaults binaries to `$HOME/.local/bin` on macOS/Linux and `%LOCALAPPDATA%\Programs\PrintingPress\bin` on Windows:
    ```bash
    npx -y @mvanhorn/printing-press-library install anac-pl --cli-only
    ```
 2. Verify: `anac-pl-pp-cli --version`
-3. Ensure `$GOPATH/bin` (or `$HOME/go/bin`) is on `$PATH`.
+3. Ensure the reported install directory is on `$PATH` for the agent/runtime that will invoke this skill.
 
-If the `npx` install fails (no Node, offline, etc.), fall back to a direct Go install (requires Go 1.26.3 or newer):
+If the `npx` install fails (no Node, offline, etc.), fall back to a direct Go install (requires Go 1.26.6 or newer). This installs into `$GOPATH/bin` (default `$HOME/go/bin`), so add that directory to `$PATH` instead:
 
 ```bash
 go install github.com/mvanhorn/printing-press-library/library/other/anac-pl/cmd/anac-pl-pp-cli@latest
 ```
 
-If `--version` reports "command not found" after install, the install step did not put the binary on `$PATH`. Do not proceed with skill commands until verification succeeds.
-
-anac-pl espone l'API pubblica della Piattaforma di Pubblicità a Valore Legale di ANAC come CLI agent-native: ricerca full-text con filtri (data, importo, CPV, tipologia), dettaglio JSON completo degli esiti, cronologia delle rettifiche, e un database SQLite locale per ricerca offline ed export CSV/JSON. Nessuna autenticazione richiesta.
+If `--version` reports "command not found" after install, the runtime cannot see the binary directory on `$PATH`. Do not proceed with skill commands until verification succeeds.
 
 ## When to Use This CLI
 
@@ -209,7 +207,7 @@ Explicit flags always win over profile values; profile values win over defaults.
 |------|---------|
 | 0 | Success |
 | 2 | Usage error (wrong arguments) |
-| 3 | Resource not found |
+| 3 | Resource not found (anche: `search-local` senza corrispondenze) |
 | 5 | API error (upstream issue) |
 | 7 | Rate limited (wait and retry) |
 | 10 | Config error |

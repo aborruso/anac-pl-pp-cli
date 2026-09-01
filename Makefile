@@ -14,6 +14,7 @@ install:
 
 clean:
 	rm -rf bin/
+	rm -f anac-pl-pp-cli anac-pl-pp-mcp anac-pl-pp-cli-dogfood
 
 build-mcp:
 	go build -o bin/anac-pl-pp-mcp ./cmd/anac-pl-pp-mcp
