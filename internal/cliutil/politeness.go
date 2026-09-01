@@ -154,6 +154,10 @@ type ErrInstanceRunning struct {
 }
 
 func (e *ErrInstanceRunning) Error() string {
+	if e.Waited <= 0 {
+		return fmt.Sprintf("un'altra istanza di anac-pl-pp-cli sta gia' interrogando il servizio (lock: %s).\n"+
+			"Ne gira una sola per volta: attendi che finisca, oppure interrompila.", e.Path)
+	}
 	return fmt.Sprintf("un'altra istanza di anac-pl-pp-cli sta ancora interrogando il servizio dopo %s di attesa (lock: %s).\n"+
 		"Ne gira una sola per volta: attendi che finisca, oppure interrompila.", e.Waited, e.Path)
 }
@@ -189,6 +193,14 @@ var InstanceWaitNotice func(string)
 // Chiamate ripetute nello stesso processo sono un no-op: il lock e' del
 // processo, non del comando.
 func AcquireSingleInstance() error {
+	return AcquireSingleInstanceWithin(InstanceWaitTimeout)
+}
+
+// AcquireSingleInstanceWithin e' AcquireSingleInstance con un'attesa massima
+// scelta dal chiamante. Un timeout nullo o negativo significa "non attendere":
+// e' cio' che serve in modalita' non interattiva, dove un comando che si ferma
+// cinque minuti e' peggio di un errore immediato.
+func AcquireSingleInstanceWithin(wait time.Duration) error {
 	instanceMu.Lock()
 	defer instanceMu.Unlock()
 	if instanceFile != nil {
@@ -206,7 +218,7 @@ func AcquireSingleInstance() error {
 		return fmt.Errorf("apertura del lock di istanza: %w", err)
 	}
 
-	deadline := time.Now().Add(InstanceWaitTimeout)
+	deadline := time.Now().Add(wait)
 	notified := false
 	for {
 		lockErr := lockExclusiveNonBlocking(f)
@@ -217,12 +229,12 @@ func AcquireSingleInstance() error {
 			f.Close()
 			return fmt.Errorf("lock di istanza su %s: %w", path, lockErr)
 		}
-		if time.Now().After(deadline) {
+		if wait <= 0 || time.Now().After(deadline) {
 			f.Close()
-			return &ErrInstanceRunning{Path: path, Waited: InstanceWaitTimeout}
+			return &ErrInstanceRunning{Path: path, Waited: max(wait, 0)}
 		}
 		if !notified && InstanceWaitNotice != nil {
-			InstanceWaitNotice(fmt.Sprintf("un'altra istanza di anac-pl-pp-cli sta interrogando il servizio: attendo il mio turno (fino a %s).", InstanceWaitTimeout))
+			InstanceWaitNotice(fmt.Sprintf("un'altra istanza di anac-pl-pp-cli sta interrogando il servizio: attendo il mio turno (fino a %s).", wait))
 			notified = true
 		}
 		time.Sleep(instanceRetryInterval)

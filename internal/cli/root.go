@@ -63,6 +63,10 @@ func Execute() error {
 	var flags rootFlags
 	rootCmd := newRootCmd(&flags)
 
+	// L'attesa del proprio turno sul lock di istanza va detta, altrimenti un
+	// comando che tace per minuti sembra bloccato.
+	cliutil.InstanceWaitNotice = func(msg string) { fmt.Fprintln(os.Stderr, msg) }
+
 	err := rootCmd.Execute()
 	if err != nil && strings.Contains(err.Error(), "unknown flag") {
 		msg := err.Error()
@@ -274,10 +278,14 @@ func (f *rootFlags) newClient() (*client.Client, error) {
 	if err != nil {
 		return nil, configErr(err)
 	}
-	// L'attesa del proprio turno va detta, altrimenti un comando che tace
-	// per minuti sembra bloccato.
-	cliutil.InstanceWaitNotice = func(msg string) { fmt.Fprintln(os.Stderr, msg) }
-	if err := cliutil.AcquireSingleInstance(); err != nil {
+	// In modalita' non interattiva (--no-input, e quindi --agent) non si
+	// attende: uno script o un agente preferisce un errore subito a un
+	// comando che tace per minuti. Interattivamente si aspetta il turno.
+	wait := cliutil.InstanceWaitTimeout
+	if f.noInput {
+		wait = 0
+	}
+	if err := cliutil.AcquireSingleInstanceWithin(wait); err != nil {
 		return nil, &cliError{code: 7, err: err}
 	}
 	c := client.New(cfg, f.timeout, cliutil.ClampRate(f.rateLimit))
