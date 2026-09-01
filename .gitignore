@@ -1,7 +1,7 @@
 # Binari compilati
-anac-pl-pp-cli
-anac-pl-pp-mcp
-anac-pubblicita-pp-cli
+/anac-pl-pp-cli
+/anac-pl-pp-mcp
+/anac-pubblicita-pp-cli
 build/
 dist/
 
