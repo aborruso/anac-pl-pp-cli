@@ -79,7 +79,7 @@ Per gli agenti che leggono le skill (Claude Code, Codex, Cursor, ...) il repo co
 # Verifica raggiungibilità dell'API
 anac-pl-pp-cli doctor
 
-# Ultimi bandi pubblicati, dal più recente
+# Ultimi bandi pubblicati, dal più recente (il servizio ordina solo senza --query: col testo libero vince la rilevanza)
 anac-pl-pp-cli cerca --tipologia bandi --size 10 --sort-field dataPubblicazione --sort-dir DESC
 
 # Trova il codice CPV partendo dalle parole
@@ -90,6 +90,9 @@ anac-pl-pp-cli cerca-avanzata --cpv 30213000
 
 # Tabella committente -> aggiudicatario -> importo -> CIG -> CPV -> giurisdizione
 anac-pl-pp-cli affidamenti --cpv-code 72412000 -t "" --pages 3 --from-search --csv
+
+# Gli affidamenti a una società, dal più recente (ordinamento su una colonna della tabella)
+anac-pl-pp-cli affidamenti -q "google workspace" --pages 3 --from-search --sort-field data --sort-dir desc --csv
 
 # Tipologie di avviso e valore da usare come filtro
 anac-pl-pp-cli tipologie list

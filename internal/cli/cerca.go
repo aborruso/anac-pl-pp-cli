@@ -170,7 +170,7 @@ Modalità (--mode):
 	f.StringVar(&from, "published-from", "", "Data pubblicazione minima, formato GG/MM/AAAA")
 	f.StringVar(&to, "published-to", "", "Data pubblicazione massima, formato GG/MM/AAAA")
 	f.StringVar(&mode, "mode", "estesa", "Modalità ricerca: estesa | esatta | archivio")
-	f.StringVar(&sortField, "sort-field", "", "Campo di ordinamento (es. dataPubblicazione)")
+	f.StringVar(&sortField, "sort-field", "", "Campo di ordinamento (es. dataPubblicazione). Il servizio lo onora solo senza --query: con testo libero ordina per rilevanza")
 	f.StringVar(&sortDir, "sort-dir", "", "Direzione ordinamento: ASC o DESC")
 	f.IntVar(&page, "page", 0, "Numero pagina (0-based)")
 	f.IntVar(&size, "size", 10, "Risultati per pagina")
