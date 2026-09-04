@@ -28,6 +28,7 @@ type affidamentoRow struct {
 	CPV              string  `json:"cpv"`
 	CPVDesc          string  `json:"cpv_desc"`
 	IDAvviso         string  `json:"id_avviso"`
+	IDAppalto        string  `json:"id_appalto"`
 }
 
 // newAffidamentiCmd appiattisce gli esiti di gara in una tabella analizzabile
@@ -67,6 +68,13 @@ al servizio, così le pagine scaricate sono davvero le prime in quell'ordine: va
 con --cpv-code e, sulla vecchia ricerca, solo senza --query. Con --query il
 servizio ordina per rilevanza e ignora la richiesta: l'ordine copre allora solo
 le pagine scaricate (--pages x --size), non l'intero archivio.
+
+Doppi invii: la piattaforma pubblica anche gli avvisi mandati due volte dalla
+stazione appaltante (stesso id_appalto, stessa scheda, contenuto identico, a
+pochi secondi di distanza), e qui compaiono come righe uguali con id_avviso
+diverso. Non vengono fusi, perché sullo stesso CIG possono esistere avvisi
+diversi e legittimi (esito, rettifica, ripubblicazione): per riconoscerli
+usa id_appalto insieme a cig, cf_aggiudicatario, importo e data.
 
 Caveat: ANAC non copre i tier gratuiti (es. Workspace for Education) né gli
 affidamenti aggregati via Consip; incrociare con altre fonti (es. MxMap).
@@ -361,7 +369,7 @@ affidamenti aggregati via Consip; incrociare con altre fonti (es. MxMap).
 
 // affidamentiSortFields sono le colonne su cui si può ordinare: gli stessi
 // nomi dell'intestazione CSV e delle chiavi JSON.
-var affidamentiSortFields = []string{"data", "importo", "committente", "aggiudicatario", "cpv", "giurisdizione", "cig", "id_avviso"}
+var affidamentiSortFields = []string{"data", "importo", "committente", "aggiudicatario", "cpv", "giurisdizione", "cig", "id_avviso", "id_appalto"}
 
 // parseAffidamentiSort valida --sort-field/--sort-dir. Campo vuoto = nessun
 // ordinamento; la direzione da sola non basta.
@@ -423,6 +431,8 @@ func sortAffidamenti(rows []affidamentoRow, field string, desc bool) {
 			return r.CIG
 		case "id_avviso":
 			return r.IDAvviso
+		case "id_appalto":
+			return r.IDAppalto
 		}
 		return ""
 	}
@@ -450,9 +460,9 @@ func emitAffidamenti(cmd *cobra.Command, flags *rootFlags, rows []affidamentoRow
 	}
 	if flags.csv {
 		w := csv.NewWriter(cmd.OutOrStdout())
-		_ = w.Write([]string{"data", "committente", "cf_committente", "aggiudicatario", "cf_aggiudicatario", "giurisdizione", "gruppo", "importo", "cig", "cpv", "cpv_desc", "id_avviso"})
+		_ = w.Write([]string{"data", "committente", "cf_committente", "aggiudicatario", "cf_aggiudicatario", "giurisdizione", "gruppo", "importo", "cig", "cpv", "cpv_desc", "id_avviso", "id_appalto"})
 		for _, r := range rows {
-			_ = w.Write([]string{r.Data, r.Committente, r.CFCommittente, r.Aggiudicatario, r.CFAggiudicatario, r.Giurisdizione, r.Gruppo, formatImporto(r.Importo), r.CIG, r.CPV, r.CPVDesc, r.IDAvviso})
+			_ = w.Write([]string{r.Data, r.Committente, r.CFCommittente, r.Aggiudicatario, r.CFAggiudicatario, r.Giurisdizione, r.Gruppo, formatImporto(r.Importo), r.CIG, r.CPV, r.CPVDesc, r.IDAvviso, r.IDAppalto})
 		}
 		w.Flush()
 		return w.Error()
@@ -481,6 +491,7 @@ func emitAffidamenti(cmd *cobra.Command, flags *rootFlags, rows []affidamentoRow
 // flattenAvviso estrae le righe (lotto × aggiudicatario) da un avviso.
 func flattenAvviso(item map[string]any) []affidamentoRow {
 	id, _ := item["idAvviso"].(string)
+	appalto, _ := item["idAppalto"].(string)
 	data, _ := item["dataPubblicazione"].(string)
 	if len(data) >= 10 {
 		data = data[:10]
@@ -504,7 +515,7 @@ func flattenAvviso(item map[string]any) []affidamentoRow {
 				out = append(out, affidamentoRow{
 					Data: data, Committente: comm, CFCommittente: cfComm,
 					Giurisdizione: giurisdizione.Ignota, Importo: importoFrom(im, nil),
-					CIG: cig, CPV: code, CPVDesc: desc, IDAvviso: id,
+					CIG: cig, CPV: code, CPVDesc: desc, IDAvviso: id, IDAppalto: appalto,
 				})
 				continue
 			}
@@ -516,7 +527,7 @@ func flattenAvviso(item map[string]any) []affidamentoRow {
 					Aggiudicatario: name, CFAggiudicatario: cleanStr(v.cf),
 					Giurisdizione: g.Giurisdizione, Gruppo: g.Gruppo,
 					Importo: importoFrom(im, v.importo),
-					CIG:     cig, CPV: code, CPVDesc: desc, IDAvviso: id,
+					CIG:     cig, CPV: code, CPVDesc: desc, IDAvviso: id, IDAppalto: appalto,
 				})
 			}
 		}
