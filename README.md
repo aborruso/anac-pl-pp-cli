@@ -98,6 +98,15 @@ anac-pl-pp-cli affidamenti -q "google workspace" --pages 3 --from-search --sort-
 anac-pl-pp-cli tipologie list
 ```
 
+## Doppi invii: righe uguali con `id_avviso` diverso
+
+La piattaforma pubblica ciò che riceve, compresi gli avvisi che una stazione appaltante manda due volte a pochi secondi di distanza: due `idAvviso` distinti, stesso `idAppalto`, stessa scheda, contenuto identico. In `affidamenti` compaiono come righe uguali con `id_avviso` diverso. Non vengono fuse, perché sullo stesso CIG esistono anche avvisi diversi e legittimi (esito, rettifica, ripubblicazione, due notice TED per lo stesso accordo quadro). La chiave per riconoscere i doppi invii è `id_appalto` insieme a `cig`, `cf_aggiudicatario`, `importo` e `data`:
+
+```bash
+anac-pl-pp-cli affidamenti -q 03289010542 -t "" --pages 3 --csv > a.csv
+duckdb -c "select * from 'a.csv' qualify row_number() over (partition by id_appalto, cig, cf_aggiudicatario, importo, data order by id_avviso) = 1"
+```
+
 ## Un limite messo apposta: una chiamata al secondo, una istanza per volta
 
 La piattaforma di ANAC è un servizio pubblico che non dichiara alcuna quota, e non c'è un modo per chiedere più banda. Il tetto quindi è scritto nel programma e non è configurabile: al massimo una richiesta al secondo.
