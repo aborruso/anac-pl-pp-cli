@@ -101,7 +101,7 @@ anac-pl-pp-cli which "<capability in your own words>"
 
 `which` resolves a natural-language capability query to the best matching command from this CLI's curated feature index. Exit code `0` means at least one match; exit code `2` means no confident match — fall back to `--help` or use a narrower query.
 
-Matching is keyword-based, not semantic: a query scores when one of its words is a command name (`cerca`, `avvisi`, `cpv`, `affidamenti`, `tipologie`, ...) or when the whole query appears in a command description. A full sentence with none of those words, such as `which "trova bandi recenti"`, returns exit 2; `which "cerca bandi"` resolves.
+Matching is word-based, not semantic: a query scores on words that appear in a command name (`cerca`, `avvisi`, `cpv`, `affidamenti`, `tipologie`, ...) or in its description, ignoring common Italian and English filler words. Use the words of the domain (`bandi`, `cpv`, `cronologia`, `affidamenti`) rather than paraphrases: `which "trova bandi recenti"` resolves to `avvisi search`, `which "chi ha vinto l'appalto"` returns exit 2.
 
 ## Recipes
 
