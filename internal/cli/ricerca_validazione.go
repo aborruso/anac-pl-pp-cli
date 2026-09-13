@@ -27,6 +27,17 @@ func risolviScheda(scheda string) (string, error) {
 	return tpl, nil
 }
 
+// ValidaRicercaAvvisi applica a --scheda e alla ricerca esatta le verifiche di
+// `avvisi search` e restituisce il template da inviare. La usa anche il tool
+// MCP avvisi_search, che chiama l'API senza passare dal comando.
+func ValidaRicercaAvvisi(scheda string, fuzzy bool) (string, error) {
+	tpl, err := risolviScheda(scheda)
+	if err != nil {
+		return "", err
+	}
+	return tpl, verificaRicercaEsatta(fuzzy, tpl)
+}
+
 // verificaRicercaEsatta blocca la ricerca esatta senza tipologia: ANAC risponde
 // 500 ("Index: 0") con o senza parole chiave. Il portale non ci arriva perché
 // nel form la tipologia è obbligatoria.
