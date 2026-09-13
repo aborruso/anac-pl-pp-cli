@@ -45,14 +45,11 @@ func newAvvisiSearchCmd(flags *rootFlags) *cobra.Command {
 					return fmt.Errorf("invalid value %q for --%s: must be one of %v", flagSortDirection, "sort-dir", allowedSortDirection)
 				}
 			}
-			scheda, err := risolviScheda(flagCodiceScheda)
+			scheda, err := ValidaRicercaAvvisi(flagCodiceScheda, flagAtlasFuzzySearchEnabled)
 			if err != nil {
 				return usageErr(err)
 			}
 			flagCodiceScheda = scheda
-			if err := verificaRicercaEsatta(flagAtlasFuzzySearchEnabled, flagCodiceScheda); err != nil {
-				return usageErr(err)
-			}
 			warnOrdinamentoIgnorato(cmd.ErrOrStderr(), flagKeywords, flagSortField, flagSortDirection)
 			c, err := flags.newClient()
 			if err != nil {
