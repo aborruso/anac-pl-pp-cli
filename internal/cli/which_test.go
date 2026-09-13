@@ -96,3 +96,18 @@ func TestWhichIndex_ExistsAndIsWellFormed(t *testing.T) {
 		}
 	}
 }
+
+// Le query segnalate nella issue #7 devono risolvere sull'indice reale.
+func TestRankWhich_IndiceRealeComandiDiRicerca(t *testing.T) {
+	cases := map[string]string{
+		"ricerca full-text avvisi":                              "avvisi search",
+		"cerca corsi di formazione su intelligenza artificiale": "cerca",
+		"codice cpv": "cpv search",
+	}
+	for q, want := range cases {
+		got := rankWhich(whichIndex, q, 3)
+		if len(got) == 0 || got[0].Entry.Command != want {
+			t.Errorf("which %q: want %s first, got %+v", q, want, got)
+		}
+	}
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": 2,
+  "id": "anac-pl-which-comandi-endpoint",
+  "applied_at": "2026-09-13",
+  "base_run_id": "20260623-093040-ed91772a",
+  "base_printing_press_version": "4.17.0",
+  "summary": "L'indice di `which` include, oltre alle tre novel feature, i comandi di ricerca e consultazione (cerca, cerca-avanzata, affidamenti, cpv search, avvisi search/get/cronologia, tipologie list, news), marcati pp:which-promoted; SKILL.md spiega che il matching e' per parole chiave.",
+  "reason": "Il generatore 4.17.0 semina l'indice solo dalle novel feature, quindi nessuna query sulla ricerca di avvisi poteva trovare un comando. Issue #7.",
+  "deferred_to_upstream": [
+    {
+      "feature": "Indice which seminato con i comandi endpoint (PR #4634) e ranker con keyword per voce: un reprint su press recente sostituisce questa patch, ma i comandi scritti a mano (cerca, cerca-avanzata, affidamenti, cpv search) vanno comunque tenuti nell'indice",
+      "reason": "Il ranker di 4.17.0 non si porta a mano senza rifare parte del reprint"
+    }
+  ],
+  "files": [
+    "internal/cli/which.go",
+    "internal/cli/which_test.go",
+    "SKILL.md"
+  ],
+  "validated_outcome": "`which \"ricerca full-text avvisi\"` -> avvisi search; `which \"cerca corsi di formazione su intelligenza artificiale\"` -> cerca; `which \"codice cpv\"` -> cpv search. `which \"trova bandi recenti\"` resta exit 2, limite del ranker documentato in SKILL.md.",
+  "upstream_issue": "https://github.com/mvanhorn/cli-printing-press/issues/4590"
+}
