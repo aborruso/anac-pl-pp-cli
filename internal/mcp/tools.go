@@ -57,7 +57,7 @@ func RegisterTools(s *server.MCPServer) {
 			mcplib.WithString("published-from", mcplib.Description("Data di pubblicazione minima, formato GG/MM/AAAA")),
 			mcplib.WithString("published-to", mcplib.Description("Data di pubblicazione massima, formato GG/MM/AAAA")),
 			mcplib.WithBoolean("archive", mcplib.Description("Cerca nell'archivio storico (richiede intervallo date inferiore a 6 mesi)")),
-			mcplib.WithString("sort-field", mcplib.Description("Campo di ordinamento (es. dataPubblicazione)")),
+			mcplib.WithString("sort-field", mcplib.Description("Campo di ordinamento (es. dataPubblicazione). Il servizio lo onora solo senza --query: con testo libero ordina per rilevanza")),
 			mcplib.WithString("sort-dir", mcplib.Description("Direzione di ordinamento: ASC o DESC")),
 			mcplib.WithBoolean("fuzzy", mcplib.Description("Abilita la ricerca fuzzy (tolleranza errori) lato motore di ricerca")),
 			mcplib.WithNumber("page", mcplib.Description("Numero di pagina (0-based)")),

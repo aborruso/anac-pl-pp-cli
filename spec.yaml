@@ -59,7 +59,7 @@ resources:
           - name: sortField
             flag_name: sort-field
             type: string
-            description: "Campo di ordinamento (es. dataPubblicazione)"
+            description: "Campo di ordinamento (es. dataPubblicazione). Il servizio lo onora solo senza --query: con testo libero ordina per rilevanza"
           - name: sortDirection
             flag_name: sort-dir
             type: string
