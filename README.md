@@ -98,6 +98,8 @@ anac-pl-pp-cli affidamenti -q "google workspace" --pages 3 --from-search --sort-
 anac-pl-pp-cli tipologie list
 ```
 
+Il testo libero di `--query` va al motore di ricerca di ANAC, che mette i termini in OR e ordina per rilevanza: su query di più parole i primi risultati sono di norma pertinenti, ma più in basso compaiono avvisi che contengono solo uno dei termini. Non c'è modo di imporre una frase o un AND: virgolette e `+` vengono ignorati senza errore, e `AND` viene cercato come parola, aggiungendo risultati estranei.
+
 ## Doppi invii: righe uguali con `id_avviso` diverso
 
 La piattaforma pubblica ciò che riceve, compresi gli avvisi che una stazione appaltante manda due volte a pochi secondi di distanza: due `idAvviso` distinti, stesso `idAppalto`, stessa scheda, contenuto identico. In `affidamenti` compaiono come righe uguali con `id_avviso` diverso. Non vengono fuse, perché sullo stesso CIG esistono anche avvisi diversi e legittimi (esito, rettifica, ripubblicazione, due notice TED per lo stesso accordo quadro). La chiave per riconoscere i doppi invii è `id_appalto` insieme a `cig`, `cf_aggiudicatario`, `importo` e `data`:
