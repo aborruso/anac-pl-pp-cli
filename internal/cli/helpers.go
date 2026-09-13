@@ -392,6 +392,11 @@ func replacePathParam(path, name, value string) string {
 	return strings.ReplaceAll(path, "{"+name+"}", url.PathEscape(value))
 }
 
+// PATCH(anac-pl-ricerca-esatta): parametri booleani con default true, per i
+// quali "false" è una scelta dell'utente e non un flag non impostato. Senza,
+// `avvisi search --fuzzy=false` non chiedeva mai la ricerca esatta.
+var conservaFalse = map[string]bool{"atlasFuzzySearchEnabled": true}
+
 // paginatedGet fetches pages and concatenates array results. The headers
 // argument carries per-endpoint required headers (e.g. cal-api-version) that
 // must be sent on every page request, including the first; pass nil when the
@@ -406,7 +411,7 @@ func paginatedGet(ctx context.Context, c interface {
 		if v == "" {
 			continue
 		}
-		if k == cursorParam || (v != "0" && v != "false") {
+		if k == cursorParam || (v != "0" && v != "false") || conservaFalse[k] {
 			clean[k] = v
 		}
 	}

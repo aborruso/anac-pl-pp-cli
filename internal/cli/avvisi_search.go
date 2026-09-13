@@ -45,6 +45,14 @@ func newAvvisiSearchCmd(flags *rootFlags) *cobra.Command {
 					return fmt.Errorf("invalid value %q for --%s: must be one of %v", flagSortDirection, "sort-dir", allowedSortDirection)
 				}
 			}
+			scheda, err := risolviScheda(flagCodiceScheda)
+			if err != nil {
+				return usageErr(err)
+			}
+			flagCodiceScheda = scheda
+			if err := verificaRicercaEsatta(flagAtlasFuzzySearchEnabled, flagCodiceScheda); err != nil {
+				return usageErr(err)
+			}
 			warnOrdinamentoIgnorato(cmd.ErrOrStderr(), flagKeywords, flagSortField, flagSortDirection)
 			c, err := flags.newClient()
 			if err != nil {
@@ -116,7 +124,7 @@ func newAvvisiSearchCmd(flags *rootFlags) *cobra.Command {
 	cmd.Flags().StringVar(&flagKeywords, "query", "", "Testo libero: parola chiave, CIG, CUP, stazione appaltante, oggetto")
 	cmd.Flags().StringVar(&flagKeywords, "keywords", "", "Testo libero: parola chiave, CIG, CUP, stazione appaltante, oggetto")
 	_ = cmd.Flags().MarkHidden("keywords")
-	cmd.Flags().StringVar(&flagCodiceScheda, "scheda", "", "Numero template della tipologia, come in 'tipologie list' (es. 4 bandi, 7 esiti; più valori separati da virgola). I codici dei risultati (AD3, A1_29) fanno rispondere 500 al servizio")
+	cmd.Flags().StringVar(&flagCodiceScheda, "scheda", "", "Tipologia avviso: numero template o nome di 'tipologie list' (es. 4 o bandi, 7 o esiti). Un solo valore; i codici dei risultati (AD3, A1_29) non sono accettati")
 	cmd.Flags().StringVar(&flagCpv, "cpv", "", "Codice CPV (Common Procurement Vocabulary) dell'oggetto della gara")
 	cmd.Flags().StringVar(&flagImportoLotto, "amount", "", "Filtro per fascia di importo del lotto")
 	cmd.Flags().StringVar(&flagImportoLotto, "importo", "", "Filtro per fascia di importo del lotto")
@@ -126,7 +134,7 @@ func newAvvisiSearchCmd(flags *rootFlags) *cobra.Command {
 	cmd.Flags().BoolVar(&flagRicercaArchivio, "archive", false, "Cerca nell'archivio storico (richiede intervallo date inferiore a 6 mesi)")
 	cmd.Flags().StringVar(&flagSortField, "sort-field", "", "Campo di ordinamento (es. dataPubblicazione). Il servizio lo onora solo senza --query: con testo libero ordina per rilevanza")
 	cmd.Flags().StringVar(&flagSortDirection, "sort-dir", "", "Direzione di ordinamento: ASC o DESC (one of: ASC, DESC)")
-	cmd.Flags().BoolVar(&flagAtlasFuzzySearchEnabled, "fuzzy", true, "Abilita la ricerca fuzzy (tolleranza errori) lato motore di ricerca")
+	cmd.Flags().BoolVar(&flagAtlasFuzzySearchEnabled, "fuzzy", true, "true (default): termini in OR per rilevanza. false: frase esatta, parole adiacenti nell'ordine dato; richiede --scheda")
 	cmd.Flags().StringVar(&flagPage, "page", "0", "Numero di pagina (0-based)")
 	cmd.Flags().IntVar(&flagSize, "size", 10, "Numero di risultati per pagina")
 	cmd.Flags().BoolVar(&flagAll, "all", false, "Fetch all pages")
