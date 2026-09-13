@@ -45,6 +45,7 @@ func newAvvisiSearchCmd(flags *rootFlags) *cobra.Command {
 					return fmt.Errorf("invalid value %q for --%s: must be one of %v", flagSortDirection, "sort-dir", allowedSortDirection)
 				}
 			}
+			warnOrdinamentoIgnorato(cmd.ErrOrStderr(), flagKeywords, flagSortField, flagSortDirection)
 			c, err := flags.newClient()
 			if err != nil {
 				return err
@@ -123,7 +124,7 @@ func newAvvisiSearchCmd(flags *rootFlags) *cobra.Command {
 	cmd.Flags().StringVar(&flagDataPubblicazioneStart, "published-from", "", "Data di pubblicazione minima, formato GG/MM/AAAA")
 	cmd.Flags().StringVar(&flagDataPubblicazioneEnd, "published-to", "", "Data di pubblicazione massima, formato GG/MM/AAAA")
 	cmd.Flags().BoolVar(&flagRicercaArchivio, "archive", false, "Cerca nell'archivio storico (richiede intervallo date inferiore a 6 mesi)")
-	cmd.Flags().StringVar(&flagSortField, "sort-field", "", "Campo di ordinamento (es. dataPubblicazione)")
+	cmd.Flags().StringVar(&flagSortField, "sort-field", "", "Campo di ordinamento (es. dataPubblicazione). Il servizio lo onora solo senza --query: con testo libero ordina per rilevanza")
 	cmd.Flags().StringVar(&flagSortDirection, "sort-dir", "", "Direzione di ordinamento: ASC o DESC (one of: ASC, DESC)")
 	cmd.Flags().BoolVar(&flagAtlasFuzzySearchEnabled, "fuzzy", true, "Abilita la ricerca fuzzy (tolleranza errori) lato motore di ricerca")
 	cmd.Flags().StringVar(&flagPage, "page", "0", "Numero di pagina (0-based)")

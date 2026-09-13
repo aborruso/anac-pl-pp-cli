@@ -82,6 +82,9 @@ anac-pl-pp-cli doctor
 # Ultimi bandi pubblicati, dal più recente (il servizio ordina solo senza --query: col testo libero vince la rilevanza)
 anac-pl-pp-cli cerca --tipologia bandi --size 10 --sort-field dataPubblicazione --sort-dir DESC
 
+# Con testo libero l'ordine è per rilevanza e --sort-field viene ignorato: per i più recenti si filtra per data
+anac-pl-pp-cli cerca -q "intelligenza artificiale" --tipologia bandi --published-from 01/06/2026
+
 # Trova il codice CPV partendo dalle parole
 anac-pl-pp-cli cpv search "posta elettronica"
 
