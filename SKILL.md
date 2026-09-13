@@ -107,9 +107,9 @@ Matching is word-based, not semantic: a query scores on words that appear in a c
 
 These come from how the ANAC search service behaves, not from the CLI. Check them before trusting a result set.
 
-- **Terms are OR-ed.** `--query` words are matched in OR and ranked by relevance: the top results are usually on topic, lower ones may contain a single term. Quotes and `+` are silently ignored; `AND` is searched as a word and adds noise.
+- **Terms are OR-ed by default.** `--query` words are matched in OR and ranked by relevance: the top results are usually on topic, lower ones may contain a single term. Quotes and `+` are silently ignored; `AND` is searched as a word and adds noise. For an exact phrase use `cerca --mode esatta` or `avvisi search --fuzzy=false`: words must be adjacent and in order, and a tipologia is required (the service answers HTTP 500 without one, so the CLI refuses first). Example: `cerca -q "data visualization" --mode esatta -t affidamenti-diretti`.
 - **Sorting is ignored with `--query`.** `--sort-field`/`--sort-dir` only work without free text; the portal's own "Ordina per" has no effect either. To get recent notices, filter with `--published-from GG/MM/AAAA`. There is no filter on the deadline (`dataScadenza`).
-- **`--scheda` takes the template number**, as listed by `tipologie list` (`4` bandi, `7` esiti, several comma-separated). Notice codes such as `AD3` or `A1_29` make the service answer HTTP 500. `cerca --tipologia` also accepts names (`bandi`, `esiti`).
+- **`--scheda` takes one tipologia**, as a template number or name from `tipologie list` (`4` or `bandi`, `7` or `esiti`). With comma-separated values the full-text search silently uses only the first, and notice codes such as `AD3` or `A1_29` make the service answer HTTP 500: the CLI rejects both.
 - **`cerca --cpv` is a text match**, not a code filter: use `cerca-avanzata --cpv` to select by code.
 - **The declared result count is an estimate** that changes across pages and identical calls.
 - **`titolo` is often `null`** (about 60% of notices, mostly AD3 and A2_* schede). `descrizione` is always set: read the notice subject from `templates[].template.metadata.descrizione`.

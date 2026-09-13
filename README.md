@@ -101,7 +101,13 @@ anac-pl-pp-cli affidamenti -q "google workspace" --pages 3 --from-search --sort-
 anac-pl-pp-cli tipologie list
 ```
 
-Il testo libero di `--query` va al motore di ricerca di ANAC, che mette i termini in OR e ordina per rilevanza: su query di più parole i primi risultati sono di norma pertinenti, ma più in basso compaiono avvisi che contengono solo uno dei termini. Non c'è modo di imporre una frase o un AND: virgolette e `+` vengono ignorati senza errore, e `AND` viene cercato come parola, aggiungendo risultati estranei.
+Il testo libero di `--query` va al motore di ricerca di ANAC. Nella ricerca estesa, quella predefinita, i termini sono in OR e ordinati per rilevanza: su query di più parole i primi risultati sono di norma pertinenti, ma più in basso compaiono avvisi che contengono solo uno dei termini. Virgolette e `+` vengono ignorati senza errore, e `AND` viene cercato come parola, aggiungendo risultati estranei.
+
+Per una frase esatta c'è la corrispondenza esatta del portale: `cerca --mode esatta` oppure `avvisi search --fuzzy=false`. Le parole devono comparire adiacenti e nell'ordine dato, e serve una tipologia, perché senza il servizio risponde 500 (la CLI lo blocca prima):
+
+```bash
+anac-pl-pp-cli cerca -q "data visualization" --mode esatta -t affidamenti-diretti
+```
 
 ## Doppi invii: righe uguali con `id_avviso` diverso
 

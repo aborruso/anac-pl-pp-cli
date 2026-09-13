@@ -35,7 +35,7 @@ le 4 fasce fisse del sito). Esempi: --amount-min 200000 --amount-max 500000.
 
 Modalità (--mode):
   estesa   (default) ricerca estesa/fuzzy
-  esatta   corrispondenza esatta
+  esatta   frase esatta: parole adiacenti nell'ordine dato; richiede --tipologia
   archivio cerca nell'archivio storico (usa un intervallo date < 6 mesi)
 `, "\n"),
 		Example: strings.Trim(`
@@ -126,6 +126,10 @@ Modalità (--mode):
 			default:
 				_ = cmd.Usage()
 				return usageErr(fmt.Errorf("--mode deve essere uno tra: estesa, esatta, archivio"))
+			}
+			if err := verificaRicercaEsatta(params["atlasFuzzySearchEnabled"] != "false", params["codiceScheda"]); err != nil {
+				_ = cmd.Usage()
+				return usageErr(err)
 			}
 
 			c, err := flags.newClient()
