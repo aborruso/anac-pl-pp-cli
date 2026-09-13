@@ -23,5 +23,6 @@
       "reason": "Eccezione locale limitata ad atlasFuzzySearchEnabled"
     }
   ],
-  "validated_outcome": "\"data visualization\" esatta su affidamenti diretti: 12 avvisi, tutti con la frase; \"visualization data\": nessuno. Senza tipologia l'API risponde 500 con e senza parole chiave. `7,8a` restituisce gli stessi avvisi di `7`, `8a,7` gli stessi di `8a`, mentre /avvisi somma i valori."
+  "validated_outcome": "\"data visualization\" esatta su affidamenti diretti: 12 avvisi, tutti con la frase; \"visualization data\": nessuno. Senza tipologia l'API risponde 500 con e senza parole chiave. `7,8a` restituisce gli stessi avvisi di `7`, `8a,7` gli stessi di `8a`, mentre /avvisi somma i valori.",
+  "upstream_issue": "https://github.com/mvanhorn/cli-printing-press/issues/4698"
 }
