@@ -83,7 +83,7 @@ anac-pl-pp-cli doctor
 anac-pl-pp-cli cerca --tipologia bandi --size 10 --sort-field dataPubblicazione --sort-dir DESC
 
 # Con testo libero l'ordine è per rilevanza e --sort-field viene ignorato: per i più recenti si filtra per data
-anac-pl-pp-cli cerca -q "intelligenza artificiale" --tipologia bandi --published-from 01/06/2026
+anac-pl-pp-cli avvisi search --query "corso intelligenza artificiale" --published-from 01/06/2026
 
 # Trova il codice CPV partendo dalle parole
 anac-pl-pp-cli cpv search "posta elettronica"
@@ -128,11 +128,13 @@ Ogni richiesta si presenta con un `User-Agent` che dichiara nome, versione e que
 
 La conseguenza pratica è che le scansioni lunghe sono lente per costruzione: `sync` di molte pagine va lanciato e lasciato lavorare. Per le analisi ripetute conviene sincronizzare una volta e poi interrogare lo store locale con `search-local` ed `export`, che non toccano la rete.
 
-## Due avvertenze sui dati
+## Tre avvertenze sui dati
 
 Il campo CPV di `cerca` non è un filtro sul codice ma un match testuale: restituisce anche avvisi con CPV estranei. Per selezionare davvero per codice serve `cerca-avanzata`, che usa l'endpoint della ricerca avanzata rilasciata in beta a luglio 2026. La CLI lo segnala su stderr quando usi `cerca --cpv`.
 
 Il numero di risultati dichiarato dal servizio, sugli aggregati, è una stima progressiva: cambia mentre sfogli le pagine e fra chiamate identiche. Va usato come ordine di grandezza, non come totale. I codici CPV completi a 8 cifre sono invece stabili.
+
+Il campo `titolo` dei metadati di un avviso è spesso `null`: su due campioni di 200 avvisi lo era in 122 e 118 casi, soprattutto sulle schede AD3 e A2_*. `descrizione` è invece sempre valorizzata, e quando ci sono entrambi i due testi possono essere diversi. Per l'oggetto dell'avviso conviene leggere `descrizione`.
 
 ## Funzioni esclusive
 
@@ -167,10 +169,10 @@ Capacità che nessun altro strumento per questa API mette a disposizione.
 ### Esiti recenti per parola chiave
 
 ```bash
-anac-pl-pp-cli avvisi search --query 'servizi informatici' --scheda P7_1_1 --size 20
+anac-pl-pp-cli cerca -q 'servizi informatici' -t esiti --published-from 01/06/2026 --size 20
 ```
 
-Filtra i risultati di gara per oggetto.
+Filtra gli esiti di gara per oggetto. Con testo libero l'ordine è per rilevanza, quindi a limitarli ai più recenti è il filtro sulla data.
 
 ### Dettaglio JSON di un esito
 
@@ -258,7 +260,7 @@ Verifica la configurazione e la raggiungibilità dell'API.
 
 ## Configurazione
 
-File di configurazione: `~/.config/anac-pl-cli/config.toml`
+File di configurazione: `~/.config/anac-pl-pp-cli/config.toml`
 
 Gli header fissi delle richieste si impostano sotto `headers`; quelli indicati sul singolo comando hanno la precedenza.
 

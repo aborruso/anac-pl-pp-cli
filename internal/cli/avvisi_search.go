@@ -116,7 +116,7 @@ func newAvvisiSearchCmd(flags *rootFlags) *cobra.Command {
 	cmd.Flags().StringVar(&flagKeywords, "query", "", "Testo libero: parola chiave, CIG, CUP, stazione appaltante, oggetto")
 	cmd.Flags().StringVar(&flagKeywords, "keywords", "", "Testo libero: parola chiave, CIG, CUP, stazione appaltante, oggetto")
 	_ = cmd.Flags().MarkHidden("keywords")
-	cmd.Flags().StringVar(&flagCodiceScheda, "scheda", "", "Filtra per codice scheda/tipologia avviso (es. AD3, P7_1_1, M1). Vedi 'tipologie map'")
+	cmd.Flags().StringVar(&flagCodiceScheda, "scheda", "", "Numero template della tipologia, come in 'tipologie list' (es. 4 bandi, 7 esiti; più valori separati da virgola). I codici dei risultati (AD3, A1_29) fanno rispondere 500 al servizio")
 	cmd.Flags().StringVar(&flagCpv, "cpv", "", "Codice CPV (Common Procurement Vocabulary) dell'oggetto della gara")
 	cmd.Flags().StringVar(&flagImportoLotto, "amount", "", "Filtro per fascia di importo del lotto")
 	cmd.Flags().StringVar(&flagImportoLotto, "importo", "", "Filtro per fascia di importo del lotto")
