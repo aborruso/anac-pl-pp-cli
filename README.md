@@ -4,9 +4,9 @@
 
 anac-pl espone l'API pubblica della Piattaforma di Pubblicità a Valore Legale di ANAC come CLI agent-native: ricerca full-text con filtri (data, importo, CPV, tipologia), dettaglio JSON completo degli esiti, cronologia delle rettifiche, e un database SQLite locale per ricerca offline ed export CSV/JSON. Nessuna autenticazione richiesta.
 
-Stampata da [@aborruso](https://github.com/aborruso) (aborruso).
+Printed by [@aborruso](https://github.com/aborruso) (aborruso).
 
-## Installazione
+## Install
 
 ### Dal catalogo Printing Press
 
