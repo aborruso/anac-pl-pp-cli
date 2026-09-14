@@ -10,7 +10,7 @@ Printed by [@aborruso](https://github.com/aborruso) (aborruso).
 
 ### Dal catalogo Printing Press
 
-Una volta che questa CLI è nel catalogo, l'installer fa tutto in un comando, binario più skill per gli agent:
+anac-pl è nel [catalogo Printing Press](https://github.com/mvanhorn/printing-press-library). L'installer fa tutto in un comando, binario più skill per gli agent:
 
 ```bash
 npx -y @mvanhorn/printing-press-library install anac-pl
@@ -20,6 +20,12 @@ Solo il binario, senza skill:
 
 ```bash
 npx -y @mvanhorn/printing-press-library install anac-pl --cli-only
+```
+
+Per aggiornarla all'ultima release del catalogo:
+
+```bash
+npx -y @mvanhorn/printing-press-library update anac-pl
 ```
 
 Senza Node, con Go 1.26.6 o superiore:
