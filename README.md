@@ -97,6 +97,9 @@ anac-pl-pp-cli cpv search "posta elettronica"
 # Filtro CPV che seleziona davvero per codice (ricerca avanzata del portale)
 anac-pl-pp-cli cerca-avanzata --cpv 30213000
 
+# Il codice come compare negli atti, con la cifra di controllo, va bene lo stesso
+anac-pl-pp-cli cerca-avanzata --cpv 30213000-5
+
 # Tabella committente -> aggiudicatario -> importo -> CIG -> CPV -> giurisdizione
 anac-pl-pp-cli affidamenti --cpv-code 72412000 -t "" --pages 3 --from-search --csv
 
