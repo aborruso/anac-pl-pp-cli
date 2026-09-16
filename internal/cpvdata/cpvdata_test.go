@@ -20,6 +20,23 @@ func TestVocabolarioCaricato(t *testing.T) {
 	}
 }
 
+// Il 16/09/2026 il vocabolario aveva a 03116200 la descrizione di 03117140, e
+// 03117140 mancava: confrontato con l'elenco CPV pubblicato da ANAC
+// (anticorruzione/npa, tipologiche/CPV.json, 9.454 voci) e con il CPV 2008.
+func TestVocabolarioAllineatoAllElencoANAC(t *testing.T) {
+	if Count() != 9454 {
+		t.Errorf("voci: %d, attese 9454 come nell'elenco ANAC", Count())
+	}
+	for code, want := range map[string]string{
+		"03116200": "Lattice naturale",
+		"03117140": "Piante utilizzate per la preparazione di fungicidi o simili",
+	} {
+		if e, ok := Get(code); !ok || e.Description != want {
+			t.Errorf("%s = %q (trovato=%v); atteso %q", code, e.Description, ok, want)
+		}
+	}
+}
+
 func TestNormalizeCPV(t *testing.T) {
 	cases := []struct {
 		name     string
