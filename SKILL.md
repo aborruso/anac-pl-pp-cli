@@ -93,7 +93,7 @@ These capabilities aren't available in any other tool for this API.
 
 **cig** — CIG tools
 
-- `anac-pl-pp-cli cig check <cig>...` — Offline structure and check-digit validation (Simog, Simog v2/PCP, SmartCIG) with ANAC's published algorithm; exit 2 if any CIG is invalid, per-code result in the output
+- `anac-pl-pp-cli cig check <cig>...` — Offline structure and check-digit validation (Simog, Simog v2/PCP, SmartCIG) with ANAC's published algorithm; always exits 0, check `valido` per code (`jq -e 'all(.valido)'` in scripts)
 
 
 ### Finding the right command
