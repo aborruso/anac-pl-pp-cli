@@ -2,7 +2,10 @@
 
 package cpvdata
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 func TestVocabolarioCaricato(t *testing.T) {
 	if Count() < 9000 {
@@ -68,5 +71,30 @@ func TestSearchConCifraDiControllo(t *testing.T) {
 	b := Search("30213000-5", 0)
 	if len(a) == 0 || len(a) != len(b) || a[0].Code != b[0].Code {
 		t.Errorf("Search con cifra di controllo: %v; senza: %v", b, a)
+	}
+}
+
+func TestCodiceConControlloRigoroso(t *testing.T) {
+	for in, want := range map[string]bool{
+		"30213000-5": true, " 30213000-5 ": true,
+		"30213000-55": false, "302-5": false, "30213000-": false, "30213000-a": false, "3021300-5": false, "30213000": false,
+	} {
+		if _, ok := CodiceConControllo(in); ok != want {
+			t.Errorf("CodiceConControllo(%q) ok=%v; want %v", in, ok, want)
+		}
+	}
+	if _, ok := Get("30213000-5"); !ok {
+		t.Error("Get(30213000-5): atteso trovato")
+	}
+	for _, in := range []string{"30213000-55", "30213000-abc", "302-5"} {
+		if _, ok := Get(in); ok {
+			t.Errorf("Get(%q): atteso non trovato", in)
+		}
+		for _, e := range Search(in, 0) {
+			if strings.HasPrefix(e.Code, "302") {
+				t.Errorf("Search(%q) non deve allargarsi ai codici 302…: trovato %s", in, e.Code)
+				break
+			}
+		}
 	}
 }
