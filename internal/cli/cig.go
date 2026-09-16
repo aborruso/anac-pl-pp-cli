@@ -32,8 +32,10 @@ le tre famiglie: Simog (iniziale numerica), Simog seconda versione e PCP
 
 Un CIG che non supera il controllo è stato trascritto male: cercarlo restituisce
 avvisi estranei senza dire perché. L'esito di ciascun CIG sta nel campo
-valido, con il motivo quando è falso; il comando esce con 0 in entrambi i casi,
-così l'esito arriva intero anche via MCP. In uno script: jq -e 'all(.valido)'.
+valido, con il motivo quando è falso, e il comando esce con 0: così l'esito
+arriva intero anche via MCP. In uno script: jq -e 'all(.valido)'. Un argomento
+che non ha nemmeno la forma di un CIG (lunghezza diversa da 10, iniziale non
+ammessa) è invece un errore d'uso ed esce con 2, senza output.
 `, "\n"),
 		Example: strings.Trim(`
   anac-pl-pp-cli cig check B7E26B1DC7
@@ -51,6 +53,9 @@ così l'esito arriva intero anche via MCP. In uno script: jq -e 'all(.valido)'.
 			esiti := make([]cig.Esito, 0, len(args))
 			for _, a := range args {
 				e := cig.Verifica(a)
+				if e.Tipo == "" {
+					return usageErr(fmt.Errorf("%q non è un CIG: %s", a, e.Motivo))
+				}
 				esiti = append(esiti, e)
 			}
 			if flags.asJSON || flags.agent || (!isTerminal(cmd.OutOrStdout()) && !flags.csv && !flags.quiet && !flags.plain) {
