@@ -6,6 +6,8 @@ anac-pl espone l'API pubblica della Piattaforma di Pubblicità a Valore Legale d
 
 Printed by [@aborruso](https://github.com/aborruso) (aborruso).
 
+La CLI è costruita con [CLI Printing Press](https://github.com/mvanhorn/cli-printing-press), che a partire da un'API genera una CLI in Go pronta sia per le persone sia per gli agenti, con server MCP, skill e store locale già inclusi, e la pubblica in un catalogo comune. È un prodotto molto comodo e lo consiglio a chi vuole fare lo stesso con altre API.
+
 ## Install
 
 ### Dal catalogo Printing Press
@@ -59,23 +61,63 @@ Nessuna configurazione, nessuna chiave: l'API di ANAC è pubblica e di sola lett
 
 ## Uso con Claude Desktop e altri client MCP
 
-Il repo contiene anche un server MCP, `anac-pl-pp-mcp`, che espone la ricerca avvisi agli assistenti che parlano quel protocollo.
+Il progetto contiene anche un server MCP, `anac-pl-pp-mcp`, che mette la ricerca di avvisi, affidamenti e CPV a disposizione degli assistenti che parlano quel protocollo. Con Claude Desktop basta chiedere in linguaggio naturale:
 
-```bash
-go build -o anac-pl-pp-mcp ./cmd/anac-pl-pp-mcp
-```
+![Claude Desktop usa anac-pl per cercare gli avvisi con CPV 30213000-5](https://raw.githubusercontent.com/aborruso/anac-pl-pp-cli/main/docs/img/claude-desktop-cpv.png)
 
-Poi nella configurazione del client (per Claude Desktop `~/Library/Application Support/Claude/claude_desktop_config.json`, su Windows `%APPDATA%\Claude\claude_desktop_config.json`):
+Il server non chiama ANAC da solo: passa ogni richiesta alla CLI `anac-pl-pp-cli`, che cerca nella sua stessa cartella (poi nella variabile `ANAC_PL_CLI_PATH`, poi nel `PATH`). Per questo i due programmi vanno tenuti insieme. Nessuna chiave da configurare.
+
+### Tutto su Windows (o tutto su macOS)
+
+La via più semplice è l'estensione `.mcpb`, un pacchetto che contiene il server e la CLI. Scaricala dalla [release del catalogo](https://github.com/mvanhorn/printing-press-library/releases/tag/anac-pl-current):
+
+- Windows x86-64: [`anac-pl-pp-mcp-windows-amd64.mcpb`](https://github.com/mvanhorn/printing-press-library/releases/download/anac-pl-current/anac-pl-pp-mcp-windows-amd64.mcpb)
+- Windows ARM: [`anac-pl-pp-mcp-windows-arm64.mcpb`](https://github.com/mvanhorn/printing-press-library/releases/download/anac-pl-current/anac-pl-pp-mcp-windows-arm64.mcpb)
+- macOS Apple Silicon: [`anac-pl-pp-mcp-darwin-arm64.mcpb`](https://github.com/mvanhorn/printing-press-library/releases/download/anac-pl-current/anac-pl-pp-mcp-darwin-arm64.mcpb)
+
+Poi aprilo con Claude Desktop (doppio clic sul file, oppure Impostazioni > Estensioni) e conferma l'installazione. La release si chiama `anac-pl-current` e viene rigenerata a ogni nuova versione: per aggiornare si scarica di nuovo il file e lo si reinstalla.
+
+Senza estensione, a mano: metti `anac-pl-pp-mcp.exe` e `anac-pl-pp-cli.exe` nella stessa cartella e aggiungi il server a `%APPDATA%\Claude\claude_desktop_config.json` (su macOS `~/Library/Application Support/Claude/claude_desktop_config.json`):
 
 ```json
 {
   "mcpServers": {
     "anac-pl": {
-      "command": "/percorso/assoluto/anac-pl-pp-mcp"
+      "command": "C:\\Users\\<utente>\\bin\\anac-pl-pp-mcp.exe"
     }
   }
 }
 ```
+
+### Claude Desktop su Windows, CLI dentro WSL
+
+Se la CLI la usi in WSL e vuoi che Claude Desktop per Windows usi quella stessa copia, installa i due programmi Linux dentro WSL, nella stessa cartella:
+
+```bash
+go install github.com/mvanhorn/printing-press-library/library/other/anac-pl/cmd/anac-pl-pp-cli@latest
+go install github.com/mvanhorn/printing-press-library/library/other/anac-pl/cmd/anac-pl-pp-mcp@latest
+```
+
+Finiscono in `~/go/bin` (oppure compilali dai sorgenti in una cartella a scelta). Poi fai lanciare il server a Windows attraverso `wsl.exe`, indicando il percorso Linux assoluto, in `%APPDATA%\Claude\claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "anac-pl": {
+      "command": "wsl.exe",
+      "args": ["-e", "/home/<utente>/go/bin/anac-pl-pp-mcp"]
+    }
+  }
+}
+```
+
+`wsl.exe -e` usa la distribuzione predefinita: se i programmi stanno in un'altra, aggiungi `"-d", "<nome-distro>"` prima di `"-e"` (l'elenco lo dà `wsl.exe -l -v`). Per aggiornare basta rilanciare i due `go install`.
+
+### Dopo l'installazione
+
+Chiudi del tutto Claude Desktop, anche dall'icona nell'area di notifica, e riaprilo: tra i connettori compare `anac-pl`. Per una prima prova che non dipende dalla rete chiedi "Il CIG B7E26B1DC8 è valido?"; per una ricerca vera, "Cerca gli avvisi con CPV 30213000-5 pubblicati da giugno 2026". Se il server non compare, su Windows i log sono in `%APPDATA%\Claude\logs\mcp.log`.
+
+In Claude Code: `claude mcp add anac-pl -s user -- /percorso/assoluto/anac-pl-pp-mcp`.
 
 Per gli agenti che leggono le skill (Claude Code, Codex, Cursor, ...) il repo contiene `SKILL.md`: copialo nella cartella delle skill del tuo agente.
 
