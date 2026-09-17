@@ -77,7 +77,7 @@ La via più semplice è l'estensione `.mcpb`, un pacchetto che contiene il serve
 
 Poi aprilo con Claude Desktop (doppio clic sul file, oppure Impostazioni > Estensioni) e conferma l'installazione. La release si chiama `anac-pl-current` e viene rigenerata a ogni nuova versione: per aggiornare si scarica di nuovo il file e lo si reinstalla.
 
-Senza estensione, a mano: metti `anac-pl-pp-mcp.exe` e `anac-pl-pp-cli.exe` nella stessa cartella e aggiungi il server a `%APPDATA%\Claude\claude_desktop_config.json` (su macOS `~/Library/Application Support/Claude/claude_desktop_config.json`):
+Senza estensione, a mano: scarica dall'[ultima release di questo repo](https://github.com/aborruso/anac-pl-pp-cli/releases/latest) l'archivio della tua piattaforma (per Windows `anac-pl-pp-cli_windows_amd64.zip`), che contiene `anac-pl-pp-mcp.exe` e `anac-pl-pp-cli.exe`, scompattalo in una cartella e aggiungi il server a `%APPDATA%\Claude\claude_desktop_config.json` (su macOS `~/Library/Application Support/Claude/claude_desktop_config.json`):
 
 ```json
 {
