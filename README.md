@@ -148,6 +148,9 @@ anac-pl-pp-cli affidamenti --cpv-code 72412000 -t "" --pages 3 --from-search --c
 # Gli affidamenti a una società, dal più recente (ordinamento su una colonna della tabella)
 anac-pl-pp-cli affidamenti -q "google workspace" --pages 3 --from-search --sort-field data --sort-dir desc --csv
 
+# Oltre la prima pagina: --pages unisce N pagine da --size (il servizio pagina a token, --page non esiste)
+anac-pl-pp-cli cerca -q "ufficio stampa" --size 50 --pages 4 --json
+
 # Tipologie di avviso e valore da usare come filtro
 anac-pl-pp-cli tipologie list
 ```
@@ -198,6 +201,8 @@ Ogni richiesta si presenta con un `User-Agent` che dichiara nome, versione e que
 La conseguenza pratica è che le scansioni lunghe sono lente per costruzione: `sync` di molte pagine va lanciato e lasciato lavorare. Per le analisi ripetute conviene sincronizzare una volta e poi interrogare lo store locale con `search-local` ed `export`, che non toccano la rete.
 
 ## Quattro avvertenze sui dati
+
+Il servizio pagina a token, non per numero di pagina: `page` veniva accettato e ignorato, restituendo sempre la prima pagina. `cerca --pages N` e `affidamenti --pages N` scorrono le pagine seguendo il token e uniscono i risultati, deduplicati per `idAvviso`. Su `avvisi search`, che espone una pagina sola, per averne di più si alza `--size`.
 
 Il campo CPV di `cerca` non è un filtro sul codice ma un match testuale: restituisce anche avvisi con CPV estranei. Per selezionare davvero per codice serve `cerca-avanzata`, che usa l'endpoint della ricerca avanzata rilasciata in beta a luglio 2026. La CLI lo segnala su stderr quando usi `cerca --cpv`.
 
